@@ -34,7 +34,7 @@ void heapsort(int *a, int length)
     int mid = length/2;
     int temp;
     for (i = mid; i > 0; i--)
-        heapadjust(a,mid,length);
+        heapadjust(a,i,length);
     for (i = length; i > 0; i--)
     {
         temp = a[i];
@@ -73,10 +73,10 @@ quicksort(int *a, int low, int high)
 int
 main(void)
 {
-    int a[] = {4,8,9,10,1,3,5,6,2,1};
+    int a[] = {10,8,9,10,1,3,5,6,2,1,19};
     heapsort(a,10);
     int i;
-    for (i = 0; i < 10; i++)
+    for (i = 1; i <= a[0]; i++)
         printf("%d ",a[i]);
     return 0;
 }
