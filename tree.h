@@ -8,6 +8,5 @@
 
 void insert(TREE_TYPE value);
 
-int find(TREE_TYPE value);
 
 void pre_order_traverse(void (*callbach)(TREE_TYPE value));
