@@ -18,7 +18,11 @@ typedef struct TREE_NODE
 }TreeNode;
 
 static TreeNode *tree;
+static TreeNode *parent = NULL;
 static int flag = 0;
+
+TreeNode *find(TREE_TYPE value);
+
 
 void
 insert(TREE_TYPE value)
@@ -41,6 +45,80 @@ insert(TREE_TYPE value)
 	current->right = NULL;
 	*link = current;
 }
+
+void
+delete(TREE_TYPE value)
+{
+    TreeNode *current = find(value);
+    TreeNode **new;
+    if (current != NULL)
+    {
+        if (parent == NULL)                                       //被删除的结点为根结点
+        {
+            tree = NULL;
+            new = &tree;
+        }
+        else
+        {
+            if (parent->value > current->value)                   //记下被删除的结点的父结点的信息
+                new = &parent->left;
+            else
+                new = &parent->right;
+        }
+        if (current->left == NULL && current->right == NULL)      //子结点为空，直接删除即可 
+        {
+            *new = NULL;
+            free(current);
+            return;
+        }
+        else if (current->left == NULL)                           //左孩子为空，让父结点相关孩子指向该结点的右孩子
+        {
+            *new = current->right;
+            free(current);
+            return;
+        }
+        else if (current->right == NULL)                          //右孩子为空，让父结点相关孩子指向该结点的左孩子
+        {
+            *new = current->left;
+            free(current);
+            return;
+        }
+        else                                                      //左右孩子均不为空
+        {
+            TreeNode *cc = current;
+            current = current->left;                              //找到删除结点的左孩子中最大的元素（或者是右孩子中最小的元素） 
+            if (current->right == NULL)                           //若左孩子没有右孩子
+            {
+                *new = current;
+                current->right = cc->right;
+            }
+            else                                                  //若有，找到最大元素
+            {
+                while(current->right != NULL)
+                {
+                    parent = current;
+                    current = current->right;
+
+                }
+                parent->right = NULL;                             //将找的的结点的父结点的右孩子重置为空，不然会形成环
+                *new = current;
+                current->right = cc->right;
+                if (current->left == NULL)
+                {
+                    current->left = cc->left;
+                }
+                else
+                {
+                    while(current->left != NULL)
+                        current = current->left;
+                    current->left = cc->left;
+                }
+            }
+            free(cc);
+        }
+    }
+}
+
 /*方法1
 void
 precreate_tree(TreeNode **T)
@@ -74,20 +152,21 @@ TreeNode*  precreate_tree()
     return T;
 }
 
-int
+TreeNode *
 find(TREE_TYPE value)
 {
 	TreeNode *current = tree;
 	while(current != NULL && current->value != value)
 	{
+        parent = current;
 		if(value > current->value)
 			current = current->right;
 		else
 			current = current->left;
 	}
 	if(current != NULL)
-		return 1;
-	return 0;
+		return current;
+	return NULL;
 }
 
 void
@@ -146,13 +225,21 @@ main(void)
 {
 	int i;
 	int value;
-	for(i = 0; i < 10; i++)
+	for(i = 0; i < 6; i++)
 	{
 		printf("input the %d value:",i+1);
 		scanf("%d",&value);
 		getchar();
 		insert(value);
 	}
+    pre_order_traverse(callback);
+
+    delete(16);
+    printf("\n");
+    //printf("%d %d %d ",tree->value,tree->left->value,tree->right->value);
+    //printf("%d %d ",tree->left->left->value,tree->left->right->value);
+    pre_order_traverse(callback);
+    printf("\n");
     judgeAVL(tree,tree_depth);
     if (flag == 0)
     {
