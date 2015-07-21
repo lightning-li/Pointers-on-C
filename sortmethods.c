@@ -57,8 +57,10 @@ heapadjust(int *a, int s, int m)
 {
     int i;
     int n = a[s];
-    for (i = 2*s; i <= m; i++)
+    
+	while (2*s <= m)
     {
+		i = 2*s;
         if (i < m && (a[i] < a[i + 1]))
             i++;
         if (n >= a[i])
